@@ -23,16 +23,9 @@ class AugmentedPatchInjector:
         """
         # Get patch
         patch_np, failure = self.patch_pool.getRandomPatch(failure_type)
-        # Split RGB and A channels
-        patch_Alpha = patch_np[:,:,3]   # (H,W)
-        patch_RGB = patch_np[:,:,:3]    # (H,W,3)
         # Augment patch
-        transformed = self.transformations[failure](image=patch_RGB, mask=patch_Alpha)
-        augmented_patch_RGB = transformed['image']
-        augmented_alpha = transformed['mask']
-        # Merge RGB and Alpha channels
-        augmented_patch_np = augmented_patch_RGB
-        augmented_patch_np = np.c_[augmented_patch_np, np.reshape(augmented_alpha, (augmented_patch_RGB.shape[0],augmented_patch_RGB.shape[1], 1))]
+        transformed = self.transformations[failure](image=patch_np)
+        augmented_patch_np = transformed['image']
         # Apply patch
         injected = self.__applyPILPatch(target, augmented_patch_np)
         return injected
